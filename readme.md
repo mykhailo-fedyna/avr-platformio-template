@@ -132,6 +132,67 @@ uint8_t read_shift_register() {
 
 ```
 
+## max72
+```c
+#include <avr/io.h>
+#include <util/delay.h>
+#include <spi.h>
+
+#define MAX7219_DECODE_MODE_REG 0x09
+#define MAX7219_INTENSITY_REG 0x0a
+#define MAX7219_SCAN_LIMIT_REG 0x0b
+#define MAX7219_SHUTDOWN_REG 0x0c
+#define MAX7219_DISPLAY_TEST_REG 0x0f
+
+#define LATCH_PIN PB2
+
+void send_to_max7219(uint8_t addr, uint8_t data);
+void setup_max7219_led_matrix(void);
+
+
+uint8_t Cat[8] = {
+  0b10001000,
+  0b11111000,
+  0b10101000,
+  0b01110001,
+  0b00100001,
+  0b01111001,
+  0b01111101,
+  0b10111110
+};
+
+
+int main(void) {
+  DDRB |= 1 << LATCH_PIN;
+
+  spi_init();
+  setup_max7219_led_matrix();
+
+  for (int i = 0; i < 8; i++) {
+    send_to_max7219(i + 1, Cat[i]);
+  }
+}
+
+void send_to_max7219(uint8_t addr, uint8_t data) {
+  spi_transfer(addr);
+  spi_transfer(data);
+
+  PORTB |= 1 << LATCH_PIN;
+  _delay_us(1);
+  PORTB &= ~(1 << LATCH_PIN);
+  _delay_us(1);
+}
+
+
+void setup_max7219_led_matrix(void) {
+  send_to_max7219(MAX7219_DECODE_MODE_REG, 0);
+  send_to_max7219(MAX7219_SCAN_LIMIT_REG, 0xf);
+  send_to_max7219(MAX7219_INTENSITY_REG, 0x07);
+  send_to_max7219(MAX7219_DISPLAY_TEST_REG, 0);
+  send_to_max7219(MAX7219_SHUTDOWN_REG, 1);
+}
+```
+
 ## SimulIDE
 
 The circuit can be simulated without any hardware using [SimulIDE](https://simulide.com/).
