@@ -18,7 +18,7 @@ a value in binary.
 pio run
 ```
 
-## uart
+## uart print
 
 `lib/uart` provides simple helpers for sending data over the UART, as used
 in `src/main.c`:
@@ -190,6 +190,52 @@ void setup_max7219_led_matrix(void) {
   send_to_max7219(MAX7219_INTENSITY_REG, 0x07);
   send_to_max7219(MAX7219_DISPLAY_TEST_REG, 0);
   send_to_max7219(MAX7219_SHUTDOWN_REG, 1);
+}
+```
+
+
+## uart
+```c
+#include <avr/io.h>
+#include <util/delay.h>
+#include <uart.h>
+
+#define LED PB5
+
+void blinkNTimes(uint8_t n);
+
+int main() {
+    DDRB |= (1 << LED);
+
+    uart_init(9600);
+
+    uart_println("Enter from 1 to 9:");
+
+    while (1) {
+        char receivedChar = uart_read();
+
+        if (receivedChar >= '1' && receivedChar <= '9') {
+            uint8_t count = receivedChar - '0';
+
+            uart_print("Blinking ");
+            uart_print_uint(count);
+            uart_println(" times");
+
+            blinkNTimes(count);
+        } else {
+            uart_println("Not valid command");
+        }
+    }
+}
+
+void blinkNTimes(uint8_t n) {
+    for (uint8_t i = 0; i < n; i++) {
+        PORTB |= (1 << LED);
+        _delay_ms(250);
+
+        PORTB &= ~(1 << LED);
+        _delay_ms(250);
+    }
 }
 ```
 
