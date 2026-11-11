@@ -326,6 +326,75 @@ void lcdPrint(const char *str) {
 
 ```
 
+## BH1750
+```c
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdint.h>
+
+#include "i2c.h"
+#include "uart.h"
+
+#define BH1750_ADDRESS 0x23
+
+void bh1750Init(void);
+uint16_t bh1750Read(void);
+
+int main(void) {
+    uart_init(9600);
+    i2cInit();
+    bh1750Init();
+
+    uart_println("BH1750 Light Sensor");
+
+    while (1) {
+        uint16_t lux = bh1750Read();
+
+        uart_print("Light: ");
+        uart_print_uint(lux);
+        uart_println(" lux");
+
+        _delay_ms(1000);
+    }
+
+    return 0;
+}
+
+
+void bh1750Init(void) {
+    i2cStart();
+
+    // BH1750 address + Write bit
+    i2cWrite(BH1750_ADDRESS << 1);
+
+    // Continuous High Resolution Mode
+    i2cWrite(0x10);
+
+    i2cStop();
+
+    // Wait for first measurement
+    _delay_ms(180);
+}
+
+uint16_t bh1750Read(void) {
+    i2cStart();
+
+    // BH1750 address + Read bit
+    i2cWrite((BH1750_ADDRESS << 1) | 1);
+
+    uint8_t high = i2cRead(1);
+    uint8_t low = i2cRead(0);
+
+    i2cStop();
+
+    uint16_t raw = ((uint16_t)high << 8) | low;
+    uint16_t lux = (uint32_t)raw * 10 / 12;
+
+    return lux;
+}
+
+```
+
 ## SimulIDE
 
 The circuit can be simulated without any hardware using [SimulIDE](https://simulide.com/).
