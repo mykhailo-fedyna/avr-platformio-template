@@ -264,7 +264,7 @@ int main(void) {
   lcdInit();
 
   lcdSetCursor(0, 0);
-  lcdPrint("Lab 5 Demo!");
+  lcdPrint("Hello!");
 
   lcdSetCursor(0, 1);
   lcdPrint("I2C LCD1602");
