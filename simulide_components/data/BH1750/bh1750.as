@@ -1,7 +1,3 @@
-// Модель датчика освітленості BH1750 для SimulIDE.
-// Адреса 0x23. Освітленість задається властивістю Lux.
-// Під час читання датчик віддає два байти: raw = Lux * 1.2
-
 IoPin@ sdaPin = component.getPin("SDA");
 IoPin@ sclPin = component.getPin("SCL");
 
