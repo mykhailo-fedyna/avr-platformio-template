@@ -4,11 +4,9 @@
 #include <uart.h>
 
 #define BH1750_ADDRESS 0x23
-#define LED PB5
-#define DARK_LIMIT 100
+
 
 int main(void) {
-    DDRB |= (1 << LED);
     uart_init(9600);
     i2cInit();
 
@@ -18,7 +16,7 @@ int main(void) {
     i2cStop();
     _delay_ms(180);
 
-    uart_println("Night light demo");
+    uart_println("Demo");
 
     while (1) {
         i2cStart();
@@ -32,14 +30,6 @@ int main(void) {
 
         uart_print_uint(lux);
 
-        if (lux < DARK_LIMIT) {
-            PORTB |= (1 << LED);
-            uart_println(" lux - dark, LED on");
-        } else {
-            PORTB &= ~(1 << LED);
-            uart_println(" lux - bright, LED off");
-        }
-
-        _delay_ms(500);
+        _delay_ms(1000);
     }
 }
