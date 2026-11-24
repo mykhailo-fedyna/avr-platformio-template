@@ -29,6 +29,7 @@ int main(void) {
         uint16_t lux = (uint32_t)raw * 10 / 12;
 
         uart_print_uint(lux);
+        uart_println("lux");
 
         _delay_ms(1000);
     }
